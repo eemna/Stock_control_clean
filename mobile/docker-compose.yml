@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        API_URL: https://stock-control-dike.onrender.com/api
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      - .:/app
+      - /app/node_modules
