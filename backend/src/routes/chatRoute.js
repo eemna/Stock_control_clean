@@ -22,5 +22,9 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Erreur interne du serveur" });
   }
 });
+// Route GET pour tester facilement depuis le navigateur
+router.get("/", (req, res) => {
+  res.send("✅ Chat API is running. Use POST /api/chat to send messages.");
+});
 
 export default router;
