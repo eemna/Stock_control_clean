@@ -42,7 +42,7 @@ app.use("/api/transactions",transactionsRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/suppliers", suppliersRoute);
 app.use("/api/products", productsRoute);
-
+app.use("/api/chat", chatRoute);
 app.post("/webhook", async (req, res) => {
   try {
     const intent = req.body.queryResult.intent.displayName;
@@ -83,7 +83,7 @@ app.post("/webhook", async (req, res) => {
     res.json({ fulfillmentText: "Erreur interne du serveur." });
   }
 });
-app.use("/api/chat", chatRoute);
+
 
 initDB().then(() => {
     app.listen(PORT, () => {
