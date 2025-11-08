@@ -9,7 +9,7 @@ import productsRoute from "./routes/productsRoute.js";
 import job from "./config/cron.js";
 import cors from "cors";
 import { sql } from "./config/db.js";
-import chatRoute from "./src/routes/chatRoute.js";
+import chatRoute from "./routes/chatRoute.js";
 
 dotenv.config();
 const app = express();
