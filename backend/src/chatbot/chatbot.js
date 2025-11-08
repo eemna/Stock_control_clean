@@ -1,6 +1,6 @@
 // src/chatbot/chatbot.js
 import dialogflow from "@google-cloud/dialogflow";
-import franc from "franc"; // ✅ import correct
+import {franc} from "franc";
 import config from "../config/devkey.js";
 
 // ✅ Création du client Dialogflow
