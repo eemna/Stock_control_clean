@@ -22,7 +22,11 @@ export default function ChatbotButton() {
         body: JSON.stringify({ message }),
       });
       const data = await res.json();
-      const botMsg = { sender: "bot", text: data.reply || "..." };
+      const botMsg = {
+  sender: "bot",
+  text: data?.reply?.trim() ? data.reply : "❌ Réponse vide du serveur.",
+};
+
       setChat((prev) => [...prev, botMsg]);
     } catch (err) {
       console.error("Erreur chatbot:", err);
