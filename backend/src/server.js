@@ -85,8 +85,15 @@ app.post("/webhook", async (req, res) => {
 });
 
 
-initDB().then(() => {
-    app.listen(PORT, () => {
-    console.log("server is up and runnig on port: " , PORT);
-});
-});
+const startServer = async () => {
+  try {
+    await initDB();
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
+  } catch (err) {
+    console.error("Erreur init DB:", err);
+  }
+};
+
+startServer();
