@@ -9,7 +9,7 @@ import productsRoute from "./routes/productsRoute.js";
 import job from "./config/cron.js";
 import cors from "cors";
 import { sql } from "./config/db.js";
-import chatRoute from "./routes/chatRoute.js";
+import chatRoute from "./src/routes/chatRoute.js";
 
 dotenv.config();
 const app = express();
@@ -89,7 +89,7 @@ const startServer = async () => {
   try {
     await initDB();
     app.listen(PORT, () =>
-      console.log(`🚀 Server running on port ${PORT}`)
+      console.log(` Server running on port ${PORT}`)
     );
   } catch (err) {
     console.error("Erreur init DB:", err);
