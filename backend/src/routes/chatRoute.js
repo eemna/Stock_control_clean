@@ -18,9 +18,10 @@ router.post("/", async (req, res) => {
 });
 
   } catch (error) {
-    console.error("Erreur /api/chat :", error);
-    res.status(500).json({ error: "Erreur interne du serveur" });
-  }
+  console.error("Erreur /api/chat :", error.message || error);
+  res.status(500).json({ error: "Erreur interne du serveur", details: error.message });
+}
+
 });
 // Route GET pour tester facilement depuis le navigateur
 router.get("/", (req, res) => {
