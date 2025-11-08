@@ -117,21 +117,23 @@ app.post("/webhook", async (req, res) => {
 
     // === Statistiques du stock ===
     else if (intent === "StatistiquesStock") {
-      const stats = await sql`
-        SELECT 
-          AVG(quantity) AS avg_qty,
-          MAX(quantity) AS max_qty,
-          MIN(quantity) AS min_qty
-        FROM products
-      `;
-      const s = stats[0];
-      const avgQty = parseFloat(s.avg_qty) || 0;
-      const maxQty = parseInt(s.max_qty) || 0;
-      const minQty = parseInt(s.min_qty) || 0;
-      text = lang === "fr"
-        ? `Moyenne: ${s.avg_qty.toFixed(2)}, Max: ${s.max_qty}, Min: ${s.min_qty}.`
-        : `Average: ${s.avg_qty.toFixed(2)}, Max: ${s.max_qty}, Min: ${s.min_qty}.`;
-    }
+  const stats = await sql`
+    SELECT 
+      AVG(quantity) AS avg_qty,
+      MAX(quantity) AS max_qty,
+      MIN(quantity) AS min_qty
+    FROM products
+  `;
+  
+  const s = stats[0];
+  const avgQty = Number(s.avg_qty) || 0;
+  const maxQty = Number(s.max_qty) || 0;
+  const minQty = Number(s.min_qty) || 0;
+
+  text = lang === "fr"
+    ? `Moyenne: ${avgQty.toFixed(2)}, Max: ${maxQty}, Min: ${minQty}.`
+    : `Average: ${avgQty.toFixed(2)}, Max: ${maxQty}, Min: ${minQty}.`;
+}
 
     // === Intent inconnu ===
     else {
