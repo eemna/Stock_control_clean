@@ -84,6 +84,11 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
+app.get("/debug-routes", (req, res) => {
+  res.json(app._router.stack
+    .filter(r => r.route)
+    .map(r => r.route.path));
+});
 
 const startServer = async () => {
   try {
