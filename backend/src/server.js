@@ -125,6 +125,9 @@ app.post("/webhook", async (req, res) => {
         FROM products
       `;
       const s = stats[0];
+      const avgQty = parseFloat(s.avg_qty) || 0;
+      const maxQty = parseInt(s.max_qty) || 0;
+      const minQty = parseInt(s.min_qty) || 0;
       text = lang === "fr"
         ? `Moyenne: ${s.avg_qty.toFixed(2)}, Max: ${s.max_qty}, Min: ${s.min_qty}.`
         : `Average: ${s.avg_qty.toFixed(2)}, Max: ${s.max_qty}, Min: ${s.min_qty}.`;
