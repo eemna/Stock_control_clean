@@ -47,40 +47,100 @@ app.post("/webhook", async (req, res) => {
   try {
     const intent = req.body.queryResult.intent.displayName;
     const parameters = req.body.queryResult.parameters;
-    let responseText = "";
+    const lang = req.body.queryResult.languageCode || "fr";
+    let text = "";
 
-    // Intent 1 : nombre total de produits
-    if (intent === "NombreProduits") {
-      const result = await sql`SELECT COUNT(*) AS total FROM products`;
-      responseText = `Il y a ${result[0].total} produits enregistrés dans le stock.`;
+    // === Liste des fournisseurs ===
+    if (intent === "ListeFournisseurs") {
+      const result = await sql`SELECT name FROM suppliers`;
+      const names = result.map(r => r.name).join(", ");
+      text = lang === "fr"
+        ? `Voici la liste des fournisseurs : ${names}`
+        : `Here is the list of suppliers: ${names}`;
     }
 
-    // Intent 2 : quantité d’un produit spécifique
+    // === Liste des produits ===
+    else if (intent === "ListeProduits") {
+      const result = await sql`SELECT title FROM products`;
+      const names = result.map(r => r.title).join(", ");
+      text = lang === "fr"
+        ? `Voici la liste des produits : ${names}`
+        : `Here is the list of products: ${names}`;
+    }
+
+    // === Nombre total de produits ===
+    else if (intent === "NombreProduits") {
+      const result = await sql`SELECT COUNT(*) AS total FROM products`;
+      text = lang === "fr"
+        ? `Il y a ${result[0].total} produits dans le stock.`
+        : `There are ${result[0].total} products in the stock.`;
+    }
+
+    // === Quantité d’un produit ===
     else if (intent === "QuantiteProduit") {
       const produit = parameters.produit?.toLowerCase();
-      const result = await sql`
-        SELECT quantity 
-        FROM products 
-        WHERE LOWER(title) = LOWER(${produit})
-      `;
+      const result = await sql`SELECT quantity FROM products WHERE LOWER(title) = ${produit}`;
       if (result.length > 0) {
-        responseText = `Il reste ${result[0].quantity} unités de ${produit}.`;
+        text = lang === "fr"
+          ? `Il reste ${result[0].quantity} unités de ${produit}.`
+          : `There are ${result[0].quantity} units of ${produit} left.`;
       } else {
-        responseText = `Je ne trouve pas de produit nommé ${produit}.`;
+        text = lang === "fr"
+          ? `Je ne trouve pas de produit nommé ${produit}.`
+          : `I can't find any product named ${produit}.`;
       }
     }
 
-    // Intent inconnu
-    else {
-      responseText = "Je n’ai pas compris la question, peux-tu la reformuler ?";
+    // === Valeur totale du stock ===
+    else if (intent === "ValeurTotaleStock") {
+      const result = await sql`SELECT SUM(amount * quantity) AS total_value FROM products`;
+      const total = result[0].total_value || 0;
+      text = lang === "fr"
+        ? `La valeur totale du stock est de ${total} dinars.`
+        : `The total stock value is ${total} dinars.`;
     }
 
-    // Réponse à Dialogflow
-    res.json({ fulfillmentText: responseText });
+    // === Produits en stock critique ===
+    else if (intent === "StockCritique") {
+      const result = await sql`SELECT title FROM products WHERE quantity < 5`;
+      if (result.length > 0) {
+        const names = result.map(r => r.title).join(", ");
+        text = lang === "fr"
+          ? `Les produits en rupture sont : ${names}`
+          : `Low stock products are: ${names}`;
+      } else {
+        text = lang === "fr"
+          ? `Aucun produit en rupture de stock.`
+          : `No products are in low stock.`;
+      }
+    }
 
-  } catch (error) {
-    console.error("Erreur webhook:", error);
-    res.json({ fulfillmentText: "Erreur interne du serveur." });
+    // === Statistiques du stock ===
+    else if (intent === "StatistiquesStock") {
+      const stats = await sql`
+        SELECT 
+          AVG(quantity) AS avg_qty,
+          MAX(quantity) AS max_qty,
+          MIN(quantity) AS min_qty
+        FROM products
+      `;
+      const s = stats[0];
+      text = lang === "fr"
+        ? `Moyenne: ${s.avg_qty.toFixed(2)}, Max: ${s.max_qty}, Min: ${s.min_qty}.`
+        : `Average: ${s.avg_qty.toFixed(2)}, Max: ${s.max_qty}, Min: ${s.min_qty}.`;
+    }
+
+    // === Intent inconnu ===
+    else {
+      text = lang === "fr"
+        ? "Je n’ai pas compris la question, peux-tu la reformuler ?"
+        : "I didn’t understand the question, could you please rephrase?";
+    }
+
+    res.json({ fulfillmentText: text });
+  } catch (err) {
+    console.error("Erreur webhook:", err);
+    res.json({ fulfillmentText: "Erreur serveur interne." });
   }
 });
 

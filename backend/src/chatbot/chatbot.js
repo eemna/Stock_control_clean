@@ -13,6 +13,8 @@ const sessionClient = new dialogflow.SessionsClient({
 
 // ✅ Fonction principale
 export const detectIntent = async (text, sessionId = "default-session") => {
+  const langDetected = franc(query); // exemple: "fra" ou "eng"
+  const lang = langDetected === "eng" ? "en" : "fr"; // simple mapping
   const sessionPath = sessionClient.projectAgentSessionPath(config.projectId, sessionId);
 
   const request = {
@@ -20,7 +22,7 @@ export const detectIntent = async (text, sessionId = "default-session") => {
     queryInput: {
       text: {
         text,
-        languageCode: "fr",
+        languageCode: lang,
       },
     },
   };

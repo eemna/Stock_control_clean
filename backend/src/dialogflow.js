@@ -13,6 +13,8 @@ const sessionClient = new dialogflow.SessionsClient({
 const projectId = 'stockbot-xltr';
 
 async function detectIntent(query, sessionId = '123456') {
+  const langDetected = franc(query); // exemple: "fra" ou "eng"
+  const lang = langDetected === "eng" ? "en" : "fr"; // simple mapping
   const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
 
   const request = {
@@ -20,7 +22,7 @@ async function detectIntent(query, sessionId = '123456') {
     queryInput: {
       text: {
         text: query,
-        languageCode: 'fr',
+        languageCode: lang,
       },
     },
   };
