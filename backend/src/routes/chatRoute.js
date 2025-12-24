@@ -1,4 +1,3 @@
-// routes/chatRoute.js
 import express from "express";
 import { detectIntent } from "../chatbot/chatbot.js";
 

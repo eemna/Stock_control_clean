@@ -10,7 +10,7 @@ import job from "./config/cron.js";
 import cors from "cors";
 import { sql } from "./config/db.js";
 import chatRoute from "./routes/chatRoute.js";
-
+import chatbotRoute from "./routes/chatRoutee.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -42,112 +42,114 @@ app.use("/api/transactions",transactionsRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/suppliers", suppliersRoute);
 app.use("/api/products", productsRoute);
-app.use("/api/chat", chatRoute);
-app.post("/webhook", async (req, res) => {
-  try {
-    const intent = req.body.queryResult.intent.displayName;
-    const parameters = req.body.queryResult.parameters;
-    const lang = req.body.queryResult.languageCode || "fr";
-    let text = "";
+app.use("/api/chat", chatbotRoute);
+
+//app.use("/api/chat", chatRoute);
+//app.post("/webhook", async (req, res) => {
+//  try {
+//    const intent = req.body.queryResult.intent.displayName;
+//    const parameters = req.body.queryResult.parameters;
+//    const lang = req.body.queryResult.languageCode || "fr";
+//    let text = "";
 
     // === Liste des fournisseurs ===
-    if (intent === "ListeFournisseurs") {
-      const result = await sql`SELECT name FROM suppliers`;
-      const names = result.map(r => r.name).join(", ");
-      text = lang === "fr"
-        ? `Voici la liste des fournisseurs : ${names}`
-        : `Here is the list of suppliers: ${names}`;
-    }
+//    if (intent === "ListeFournisseurs") {
+//      const result = await sql`SELECT name FROM suppliers`;
+//      const names = result.map(r => r.name).join(", ");
+//      text = lang === "fr"
+//        ? `Voici la liste des fournisseurs : ${names}`
+//        : `Here is the list of suppliers: ${names}`;
+//    }
 
     // === Liste des produits ===
-    else if (intent === "ListeProduits") {
-      const result = await sql`SELECT title FROM products`;
-      const names = result.map(r => r.title).join(", ");
-      text = lang === "fr"
-        ? `Voici la liste des produits : ${names}`
-        : `Here is the list of products: ${names}`;
-    }
+//    else if (intent === "ListeProduits") {
+//      const result = await sql`SELECT title FROM products`;
+//      const names = result.map(r => r.title).join(", ");
+//      text = lang === "fr"
+//        ? `Voici la liste des produits : ${names}`
+//        : `Here is the list of products: ${names}`;
+//    }
 
     // === Nombre total de produits ===
-    else if (intent === "NombreProduits") {
-      const result = await sql`SELECT COUNT(*) AS total FROM products`;
-      text = lang === "fr"
-        ? `Il y a ${result[0].total} produits dans le stock.`
-        : `There are ${result[0].total} products in the stock.`;
-    }
+//    else if (intent === "NombreProduits") {
+//      const result = await sql`SELECT COUNT(*) AS total FROM products`;
+//      text = lang === "fr"
+//        ? `Il y a ${result[0].total} produits dans le stock.`
+//        : `There are ${result[0].total} products in the stock.`;
+//    }
 
     // === Quantité d’un produit ===
-    else if (intent === "QuantiteProduit") {
-      const produit = parameters.produit?.toLowerCase();
-      const result = await sql`SELECT quantity FROM products WHERE LOWER(title) = ${produit}`;
-      if (result.length > 0) {
-        text = lang === "fr"
-          ? `Il reste ${result[0].quantity} unités de ${produit}.`
-          : `There are ${result[0].quantity} units of ${produit} left.`;
-      } else {
-        text = lang === "fr"
-          ? `Je ne trouve pas de produit nommé ${produit}.`
-          : `I can't find any product named ${produit}.`;
-      }
-    }
+ //   else if (intent === "QuantiteProduit") {
+//      const produit = parameters.produit?.toLowerCase();
+//      const result = await sql`SELECT quantity FROM products WHERE LOWER(title) = ${produit}`;
+//      if (result.length > 0) {
+//        text = lang === "fr"
+//          ? `Il reste ${result[0].quantity} unités de ${produit}.`
+//          : `There are ${result[0].quantity} units of ${produit} left.`;
+//      } else {
+//        text = lang === "fr"
+//        ? `Je ne trouve pas de produit nommé ${produit}.`
+//          : `I can't find any product named ${produit}.`;
+//      }
+//    }
 
     // === Valeur totale du stock ===
-    else if (intent === "ValeurTotaleStock") {
-      const result = await sql`SELECT SUM(amount * quantity) AS total_value FROM products`;
-      const total = result[0].total_value || 0;
-      text = lang === "fr"
-        ? `La valeur totale du stock est de ${total} dinars.`
-        : `The total stock value is ${total} dinars.`;
-    }
+ //   else if (intent === "ValeurTotaleStock") {
+//      const result = await sql`SELECT SUM(amount * quantity) AS total_value FROM products`;
+//      const total = result[0].total_value || 0;
+//      text = lang === "fr"
+//        ? `La valeur totale du stock est de ${total} dinars.`
+//        : `The total stock value is ${total} dinars.`;
+  //  }
 
     // === Produits en stock critique ===
-    else if (intent === "StockCritique") {
-      const result = await sql`SELECT title FROM products WHERE quantity < 5`;
-      if (result.length > 0) {
-        const names = result.map(r => r.title).join(", ");
-        text = lang === "fr"
-          ? `Les produits en rupture sont : ${names}`
-          : `Low stock products are: ${names}`;
-      } else {
-        text = lang === "fr"
-          ? `Aucun produit en rupture de stock.`
-          : `No products are in low stock.`;
-      }
-    }
+//    else if (intent === "StockCritique") {
+//      const result = await sql`SELECT title FROM products WHERE quantity < 5`;
+//      if (result.length > 0) {
+//        const names = result.map(r => r.title).join(", ");
+//        text = lang === "fr"
+//          ? `Les produits en rupture sont : ${names}`
+//          : `Low stock products are: ${names}`;
+//      } else {
+//        text = lang === "fr"
+//          ? `Aucun produit en rupture de stock.`
+//          : `No products are in low stock.`;
+//      }
+//    }
 
     // === Statistiques du stock ===
-    else if (intent === "StatistiquesStock") {
-  const stats = await sql`
-    SELECT 
-      AVG(quantity) AS avg_qty,
-      MAX(quantity) AS max_qty,
-      MIN(quantity) AS min_qty
-    FROM products
-  `;
+//    else if (intent === "StatistiquesStock") {
+//  const stats = await sql`
+//    SELECT 
+//      AVG(quantity) AS avg_qty,
+//      MAX(quantity) AS max_qty,
+//      MIN(quantity) AS min_qty
+//    FROM products 
+ /// `;
   
-  const s = stats[0];
-  const avgQty = Number(s.avg_qty) || 0;
-  const maxQty = Number(s.max_qty) || 0;
-  const minQty = Number(s.min_qty) || 0;
+ // const s = stats[0];
+//  const avgQty = Number(s.avg_qty) || 0;
+//  const maxQty = Number(s.max_qty) || 0;
+//  const minQty = Number(s.min_qty) || 0;
 
-  text = lang === "fr"
-    ? `Moyenne: ${avgQty.toFixed(2)}, Max: ${maxQty}, Min: ${minQty}.`
-    : `Average: ${avgQty.toFixed(2)}, Max: ${maxQty}, Min: ${minQty}.`;
-}
+//  text = lang === "fr"
+//    ? `Moyenne: ${avgQty.toFixed(2)}, Max: ${maxQty}, Min: ${minQty}.`
+//    : `Average: ${avgQty.toFixed(2)}, Max: ${maxQty}, Min: ${minQty}.`;
+//}
 
     // === Intent inconnu ===
-    else {
-      text = lang === "fr"
-        ? "Je n’ai pas compris la question, peux-tu la reformuler ?"
-        : "I didn’t understand the question, could you please rephrase?";
-    }
+//    else {
+//      text = lang === "fr"
+//        ? "Je n’ai pas compris la question, peux-tu la reformuler ?"
+//        : "I didn’t understand the question, could you please rephrase?";
+//    }
 
-    res.json({ fulfillmentText: text });
-  } catch (err) {
-    console.error("Erreur webhook:", err);
-    res.json({ fulfillmentText: "Erreur serveur interne." });
-  }
-});
+//    res.json({ fulfillmentText: text });
+//  } catch (err) {
+//    console.error("Erreur webhook:", err);
+//    res.json({ fulfillmentText: "Erreur serveur interne." });
+//  }
+//});
 
 app.get("/debug-routes", (req, res) => {
   res.json(app._router.stack

@@ -22,7 +22,7 @@ export default function CreateScreen() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  // 🔹 Charger l'utilisateur connecté
+  //  Charger l'utilisateur connecté
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -53,7 +53,7 @@ export default function CreateScreen() {
       ? allOptions.filter((item) => item.form === "product")
       : allOptions;
 
-  // 🔹 Gestion animation
+  //  Gestion animation
   const toggleForm = (form) => {
     if (activeForm === form) {
       setActiveForm(null);

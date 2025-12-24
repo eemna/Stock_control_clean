@@ -20,6 +20,8 @@ import { TransactionItem } from "../../components/TransactionItems";
 import NoTransactionsFound from "../../components/NoTransactionsFound";
 import PageLoader from "../../components/PageLoader";
 import ChatbotButton from "../../components/ChatbotButton";
+import { Camera } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 
 
 export default function HomeScreen() {
@@ -27,6 +29,10 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const router = useRouter();
+  const [photo, setPhoto] = useState(null);
+  const [prediction, setPrediction] = useState(null);
+  const [loadingAI, setLoadingAI] = useState(false);
+  
 
   // Load user from AsyncStorage
   useEffect(() => {
@@ -85,6 +91,50 @@ export default function HomeScreen() {
         <Text style={{ color: "red" }}>Error: {error}</Text>
       </View>
     );
+    const takePhoto = async () => {
+  const permission = await ImagePicker.requestCameraPermissionsAsync();
+  if (!permission.granted) {
+    Alert.alert("Permission refusée", "Accès caméra requis");
+    return;
+  }
+
+  const result = await ImagePicker.launchCameraAsync({
+    quality: 0.8,
+  });
+
+  if (!result.canceled) {
+    setPhoto(result.assets[0]);
+    sendToAI(result.assets[0]);
+  }
+};
+const sendToAI = async (image) => {
+  setLoadingAI(true);
+  setPrediction(null);
+
+  const formData = new FormData();
+  formData.append("image", {
+    uri: image.uri,
+    name: "photo.jpg",
+    type: "image/jpeg",
+  });
+
+  try {
+    const res = await fetch("http://192.168.1.16:8080/predict", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const data = await res.json();
+    setPrediction(data.class);
+  } catch (err) {
+    Alert.alert("Erreur", "Impossible de contacter le serveur");
+  }
+
+  setLoadingAI(false);
+};
 
   return (
     <View style={styles.container} contentContainerStyle={{ flexGrow: 1 }}>
@@ -163,6 +213,39 @@ export default function HomeScreen() {
       />
        <View style={styles.container}>
     {/* ...tout ton contenu existant... */}
+    <TouchableOpacity
+  onPress={takePhoto}
+  style={{
+    backgroundColor: COLORS.primary,
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    margin: 15,
+    flexDirection: "row",
+    justifyContent: "center",
+  }}
+>
+  <Ionicons name="camera" size={20} color="#fff" />
+  <Text style={{ color: "#fff", marginLeft: 8, fontWeight: "bold" }}>
+    Scanner une pièce
+  </Text>
+</TouchableOpacity>
+
+{loadingAI && <Text style={{ textAlign: "center" }}>Analyse en cours...</Text>}
+
+{prediction && (
+  <Text
+    style={{
+      textAlign: "center",
+      fontSize: 18,
+      fontWeight: "bold",
+      color: "green",
+    }}
+  >
+    Pièce détectée : {prediction}
+  </Text>
+)}
+
     <ChatbotButton />  {/* 👈 bouton flottant ajouté ici */}
   </View>
     </View>

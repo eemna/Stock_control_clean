@@ -29,14 +29,14 @@ export function useLogin() {
         return false;
       }
 
-      //  Enregistrer l'utilisateur dans AsyncStorage
+     
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
 
-      console.log("✅ Connexion réussie :", data.user);
+      console.log(" Connexion réussie :", data.user);
       router.push("/"); // Redirige vers la page principale
       return true;
     } catch (error) {
-      console.error("❌ Erreur de connexion :", error);
+      console.error(" Erreur de connexion :", error);
       alert("Erreur de connexion au serveur");
       return false;
     } finally {

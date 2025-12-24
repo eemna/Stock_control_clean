@@ -3,16 +3,16 @@ import dialogflow from "@google-cloud/dialogflow";
 import { franc } from "franc";
 import config from "../config/devkey.js";
 
-// ✅ Création du client Dialogflow
+// Création du client Dialogflow
 const sessionClient = new dialogflow.SessionsClient({
   projectId: config.projectId,
   credentials: {
     client_email: config.client_email,
-    private_key: config.private_key.replace(/\\n/g, "\n"), // ⚠️ important
+    private_key: config.private_key.replace(/\\n/g, "\n"), // important
   },
 });
 
-// ✅ Fonction principale
+// Fonction principale
 export const detectIntent = async (text, sessionId = "default-session") => {
   try {
     // --- Détection de la langue ---
@@ -35,14 +35,14 @@ export const detectIntent = async (text, sessionId = "default-session") => {
 
     const [response] = await sessionClient.detectIntent(request);
 
-    // 🧠 DEBUG complet de la réponse
-    console.log("🧠 --- RÉPONSE COMPLÈTE DE DIALOGFLOW ---");
+    // DEBUG complet de la réponse
+    console.log("--- RÉPONSE COMPLÈTE DE DIALOGFLOW ---");
     console.dir(response.queryResult, { depth: null });
 
     // Retourne seulement les infos nécessaires
     return response.queryResult;
   } catch (error) {
-    console.error("❌ Erreur Dialogflow:", error);
+    console.error(" Erreur Dialogflow:", error);
     return {
       fulfillmentText: "Erreur de communication avec Dialogflow.",
       intent: { displayName: "Error" },
