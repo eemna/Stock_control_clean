@@ -116,17 +116,24 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // 🤖 FALLBACK
-// 🤖 QUESTION GÉNÉRALE → LLM
+// QUESTION GÉNÉRALE → LLM
 if (!isStockQuestion(intent)) {
-  const llmReply = await askLLM(
-    `Réponds clairement en français : ${message}`
-  );
+  try {
+    const llmReply = await askLLM(
+      `Réponds clairement en français : ${message}`
+    );
 
-  return res.json({
-    reply: llmReply || "Je n'ai pas pu générer de réponse."
-  });
+    return res.json({
+      reply: llmReply || "Je n'ai pas pu générer de réponse."
+    });
+  } catch (e) {
+    console.error("LLM error:", e);
+    return res.json({
+      reply: "Je peux répondre uniquement aux questions de stock."
+    });
+  }
 }
+
 
   } catch (err) {
     console.error("Chat error:", err);
