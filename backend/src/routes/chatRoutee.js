@@ -1,5 +1,6 @@
 import express from "express";
 import { sql } from "../config/db.js";
+import { askLLM } from "../services/ollama.js";
 
 const router = express.Router();
 
@@ -17,7 +18,15 @@ function detectIntent(message) {
 
   return "UNKNOWN";
 }
-
+function isStockQuestion(intent) {
+  return [
+    "OUT_OF_STOCK",
+    "LOW_STOCK",
+    "ALL_STOCK",
+    "PRICE",
+    "HELLO",
+  ].includes(intent);
+}
 /**
  * Endpoint chatbot
  */
@@ -108,9 +117,17 @@ router.post("/", async (req, res) => {
     }
 
     // 🤖 FALLBACK
-    return res.json({
-      reply: "Je n'ai pas compris ❓ Essayez : stock, rupture, prix...",
-    });
+// 🤖 QUESTION GÉNÉRALE → LLM
+if (!isStockQuestion(intent)) {
+  const llmReply = await askLLM(
+    `Réponds clairement en français : ${message}`
+  );
+
+  return res.json({
+    reply: llmReply || "Je n'ai pas pu générer de réponse."
+  });
+}
+
   } catch (err) {
     console.error("Chat error:", err);
     res.status(500).json({ reply: "Erreur serveur chatbot" });
